@@ -22,6 +22,8 @@ class DispatchProject(info: ProjectInfo) extends ParentProject(info) with poster
   lazy val twitter = project("twitter", "Dispatch Twitter", new DispatchModule(_), http, json, http_json, oauth, lift_json)
   lazy val meetup = project("meetup", "Dispatch Meetup", new DispatchModule(_), http, lift_json, oauth, mime)
 
+  lazy val neo4j = project("neo4j", "Dispatch Neo4j", new DispatchModule(_), http, json, http_json)
+
   lazy val aws_s3 = project("aws-s3", "Dispatch S3", new DispatchModule(_), http)
 
   lazy val agg = project("agg", "Databinder Dispatch", new AggregateProject(_) {
@@ -56,7 +58,7 @@ class DispatchProject(info: ProjectInfo) extends ParentProject(info) with poster
     val httpclient = "org.apache.httpcomponents" % "httpclient" % "4.0.1"
     val jcip = "net.jcip" % "jcip-annotations" % "1.0" % "provided->default"
   }
-  
+
   lazy val publishJavadocs = task { None } dependsOn agg.doc
 
   abstract class AggregateProject(info: ProjectInfo) extends DefaultProject(info) {
