@@ -1,0 +1,80 @@
+Try Dispatch
+------------
+
+### Getting a Console
+
+The simplest way to try Dispatch is to clone the Twine example
+application from github.
+
+    git clone https://github.com/n8han/dispatch-twine.git
+
+> If you don't have git available, you can download and extract the
+project's current
+[zip archive](https://github.com/n8han/dispatch-twine/zipball/master).
+
+[zip]: https://github.com/n8han/dispatch-twine/zipball/master
+
+Twine is built with sbt 0.10. If you haven't yet [setup sbt][sbt], now
+is a good time to do that. Once you have `sbt` on your executable search
+path, you can enter its interactive console for the Twine project.
+
+[sbt]: https://github.com/harrah/xsbt/wiki/Setup
+
+    cd dispatch-twine
+    sbt
+
+In sbt's console, call the `console` task.
+
+    console
+
+On the first run this task will download Dispatch dependencies and
+compile the Twine app. After that, you should see a message welcoming
+you to the console and a friendly `scala>` prompt.
+
+### Your First Request
+
+First, import the main Dispatch classes and objects into scope.
+
+```scala
+import dispatch._
+```
+Then, we'll need an HTTP *executor* to carry out our requests.
+
+```scala
+val h = new Http
+```
+Requests are described with `dispatch.Request` objects, and one way to
+construct them is with a URL.
+
+```scala
+val req = url("http://www.scala-lang.org/")
+```
+This works because you've imported an object called `url` from the
+`dispatch` package, and the object is itself a function that creates
+request objects.
+
+Now, we have an executor and a request. Dispatch needs to know how to
+handle the request.
+
+```scala
+val handler = req >>> System.out
+```
+With this complete request-response handler, Dispatch can execute the
+request. Assuming you have a network connection, that is.
+
+```scala
+h(handler)
+```
+And that was the source of the Scala home page. Of course, we don't
+usually assign all these component parts to values unless we need to
+reuse them. Typically, the handler above would be written in one line.
+
+```scala
+h(url("http://www.scala-lang.org/") >>> System.out)
+```
+
+If you can't wait to see more Dispatch *verbs* like `>>>`, here's a
+[colorful cheat sheet][table].
+
+[gh]: https://github.com/n8han/dispatch-twine#readme
+[table]: http://www.flotsam.nl/dispatch-periodic-table.html

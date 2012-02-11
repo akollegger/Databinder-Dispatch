@@ -1,0 +1,36 @@
+#### Changes
+
+* New XHTML handler verb `</>` to handle imperfect inputs that the
+  xml handler `<>` would choke on.
+* [dispatch.Logger](http://sourced.implicit.ly/net.databinder/dispatch-core/0.8.2/executor.scala.html#9104)
+  trait declares a `warn` method. Any custom
+  implementations will need to define it.
+* The base `HttpExecutor` defines a [shutdown()](http://sourced.implicit.ly/net.databinder/dispatch-core/0.8.2/executor.scala.html#18266) 
+  method which should be
+  called when finished with any instance.
+* `HttpExecutor` defines a `finalize()` method that shuts down the
+  instance if needed, and issues a warning.
+* Removed dynamic call to Configgy logging, which fails on Scala 2.9
+  if its incompatible classes are on the classpath.
+
+#### Shutdown Notes
+
+Although Dispatch 0.7 did not require single-connection client
+instances to be shutdown after use, changes in the underlying Apache
+HttpComponents library introduced in Dispatch 0.8 effectively require
+shutdown for any client instance.
+
+If an application creates many instances (a few hundred) of a client
+and does not shut them down, resources held by the underlying library
+will be exhausted and calls to new clients will block indefinitely. To
+mitigate the problem Dispatch invokes `shutdown()` from its
+`finalize()` method, but an application should not depend on the
+garbage collector to keep up with a fluctuating pool of executors.
+
+If you are using a single-connection executor, Dispatch recommends
+that you retain it for a thread of execution (instead of creating new
+instances for each call) and shut it down before the thread
+terminates. Alternatively, consider sharing a thread-safe client
+across your application, which can be easily mixed in to blocking
+executors with the [dispatch.thread.Safety](http://sourced.implicit.ly/net.databinder/dispatch-http/0.8.2/thread/thread.scala.html#9391)
+trait.

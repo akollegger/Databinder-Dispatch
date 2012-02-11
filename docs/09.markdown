@@ -1,0 +1,22 @@
+API Reference
+-------------
+
+### Dispatch Periodic Table
+
+[This clever and attractive table][table] lists Dispatch's request and
+response verbs all in one place.
+
+[table]: http://www.flotsam.nl/dispatch-periodic-table.html
+
+### Scaladocs
+
+[Generated documentation][scaladoc] is available for the latest
+version of Dispatch. Since most Dispatch interaction is defined by
+*verbs* that are added implicitly to requests, the interesting
+classes are `RequestVerbs`, `CallbackVerbs`, and so on.
+
+[scaladoc]: http://databinder.net/dispatch-doc/
+
+
+[sxr]: http://github.com/harrah/browse/tree/master
+[doc]: /dispatch-doc/

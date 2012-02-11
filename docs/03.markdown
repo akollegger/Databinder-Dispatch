@@ -1,0 +1,101 @@
+Project Setup
+-------------
+
+### Modules and Artifacts
+
+Dispatch is divided into a number of modules so that client
+applications need only depend on the parts of Dispatch they use. Some
+of the modules depend on other modules, and dependencies managers will
+add these transitive dependencies automatically.
+
+Each module is [cross-built][sbt] against several versions of Scala
+and [published to the scala-tools][st] repository with the
+organization-id "net.databinder". The modules have the Scala version
+they are built against appended. For Scala $scala$, the full artifact
+names are as follows:
+
+* dispatch-http_$scala$
+* dispatch-nio_$scala$
+* dispatch-core_$scala$
+* dispatch-gae_$scala$
+* dispatch-futures_$scala$
+* dispatch-mime_$scala$
+* dispatch-json_$scala$
+* dispatch-http-json_$scala$
+* dispatch-oauth_$scala$
+
+[dn]: http://databinder.net/repo/
+[st]: http://scala-tools.org/repo-releases/net/databinder/
+[sbt]: http://code.google.com/p/simple-build-tool/wiki/CrossBuild
+
+### Source Dependencies
+
+Because each web API and third party Scala library has its own release
+timeline, some modules are not part of the main Dispatch build and
+distribution. Instead, they are external modules hosted on github
+and tagged for release as needed.
+
+Since these modules are build from source, binary compatibility with
+Scala and Dispatch versions is not an issue. More importantly, they
+can be trivially initted, forked, and used by anyone.
+
+If a module is lacking an API method that you need right now, you can
+fork it, fix it, tag it, and push it without waiting on anyone
+else. At that point it's "released" under your name. You should also
+fork this documentation to add your integration module to the list:
+
+* [dispatch/dispatch-lift-json](https://github.com/dispatch/dispatch-lift-json) -- The lift-json parsing and serialization library
+* [n8han/dispatch-aws-s3](https://github.com/n8han/dispatch-aws-s3) -- Amazon S3 signing and bucket interaction
+* [n8han/dispatch-couch](https://github.com/n8han/dispatch-couch) -- Basic CouchDB integration module, rather outdated
+* [n8han/dispatch-google-clientlogin](https://github.com/n8han/dispatch-google-clientlogin) -- Google's ClientLogin
+* [n8han/dispatch-meetup](https://github.com/n8han/dispatch-meetup) -- Meetup Groups and Everywhere APIs
+* [n8han/dispatch-twitter](https://github.com/n8han/dispatch-twitter) -- Basic Twitter integration for Dispatch, pls fork!
+
+### Build Tools
+
+#### Configuring sbt Projects
+
+When using sbt with Scala **binary dependencies**, it's best to have the
+Scala version [automatically appended][sbt] so it will always match
+your project's. In a sbt 0.11.x `build.sbt`:
+
+```scala
+libraryDependencies ++= Seq(
+  "net.databinder" %% "dispatch-http" % "$version$"
+)
+```
+
+To use **source dependencies** with sbt, create a project build such
+as `project/build.scala`. This is an example using dispatch-lift-json:
+
+```scala
+import sbt._
+object MyApp extends Build
+{
+  lazy val root =
+    Project("root", file(".")) dependsOn(dispatchLiftJson)
+  lazy val dispatchLiftJson =
+    uri("git://github.com/dispatch/dispatch-lift-json#0.1.0")
+}
+```
+
+The [Twine example application][twine] uses both source and
+binary Dispatch dependencies in its sbt project.
+
+[twine]: /Try+Dispatch.html
+
+#### Maven
+
+With Maven, you can depend on Dispatch's binary modules by specifying
+the full artifact id with Scala version:
+
+```xml
+<dependency>
+  <groupId>net.databinder</groupId>
+  <artifactId>dispatch-http_$scala$</artifactId>
+  <version>$version$</version>
+</dependency>
+```
+
+To use source dependencies with Maven, your best bet is to check out
+the project as a submodule.
