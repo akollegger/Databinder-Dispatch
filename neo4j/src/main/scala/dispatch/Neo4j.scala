@@ -93,12 +93,26 @@ case class GraphData(endpoint: String) extends Request(endpoint) with DiscoveryE
 case class DbManagement(endpoint: String) extends Request(endpoint) with DiscoveryEndpoint
 {
   def services(implicit http: Http) = discover[JsObject]("services").map(s => Services(s))
-
 }
 
+object Node
+{
+  def apply(js: JsObject):Option[Node] = {
+    js.self.get(JsString("self")).flatMap(_ match {
+      case JsString(s) => {
+        val newNode = new Node(s.self)
+        newNode._meta = Some(js.self)
+        Some(newNode)
+      }
+      case _ => None
+    })
+  }
+}
 case class Node(endpoint: String) extends Request(endpoint) with DiscoveryEndpoint
 {
   def self(implicit http: Http) = discover[JsString]("self").map(s => new Request(s.self))
+
+  def data(implicit http: Http) = discover[JsObject]("data")
 
   def properties(implicit http: Http) = discover[JsString]("properties").map(s => new Request(s.self))
 
@@ -110,9 +124,7 @@ case class Node(endpoint: String) extends Request(endpoint) with DiscoveryEndpoi
 
   def createRelationship(implicit http: Http) = discover[JsString]("create_relationship").map(s => new Request(s.self))
 
-  def update(js: JsValue) = this <<< js.toString >|
-
-  def delete(rev: String) = DELETE <<? Map("rev" -> rev) >|
+  def delete = DELETE >|
 }
 
 object Services
